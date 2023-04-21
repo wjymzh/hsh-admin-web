@@ -7,21 +7,19 @@
       class="login-form"
     >
       <div class="flex text-white items-center py-4">
-        <span class="text-2xl flex-1 text-center">{{ $t('login.title') }}</span>
-        <lang-select style="color: #fff" />
+        <span class="text-2xl flex-1 text-center">荟森活销售管理后台</span>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="account">
         <div class="p-2 text-white">
           <svg-icon icon-class="user" />
         </div>
         <el-input
           class="flex-1"
-          ref="username"
+          ref="account"
           size="large"
-          v-model="loginData.username"
-          :placeholder="$t('login.username')"
-          name="username"
+          v-model="loginData.account"
+          name="account"
         />
       </el-form-item>
 
@@ -53,53 +51,26 @@
         </el-form-item>
       </el-tooltip>
 
-      <!-- 验证码 -->
-      <el-form-item prop="verifyCode">
-        <span class="p-2 text-white">
-          <svg-icon icon-class="verify_code" />
-        </span>
-        <el-input
-          v-model="loginData.verifyCode"
-          auto-complete="off"
-          :placeholder="$t('login.verifyCode')"
-          class="w-[60%]"
-          @keyup.enter="handleLogin"
-        />
-
-        <div class="captcha">
-          <img :src="captchaBase64" @click="getCaptcha" />
-        </div>
-      </el-form-item>
-
       <el-button
         size="default"
         :loading="loading"
         type="primary"
         class="w-full"
         @click.prevent="handleLogin"
-        >{{ $t('login.login') }}
+      >
+        登陆
       </el-button>
-
-      <!-- 账号密码提示 -->
-      <div class="mt-4 text-white text-sm">
-        <span>{{ $t('login.username') }}: admin</span>
-        <span class="ml-4"> {{ $t('login.password') }}: 123456</span>
-      </div>
     </el-form>
   </div>
 </template>
 
 <script setup lang="ts">
 import router from '@/router';
-import LangSelect from '@/components/LangSelect/index.vue';
-import SvgIcon from '@/components/SvgIcon/index.vue';
-
 // 状态管理依赖
 import { useUserStore } from '@/store/modules/user';
 
 // API依赖
 import { LocationQuery, LocationQueryValue, useRoute } from 'vue-router';
-import { getCaptchaApi } from '@/api/auth';
 import { LoginData } from '@/api/auth/types';
 
 const userStore = useUserStore();
@@ -117,10 +88,6 @@ const isCapslock = ref(false);
  * 密码是否可见
  */
 const passwordVisible = ref(false);
-/**
- * 验证码图片Base64字符串
- */
-const captchaBase64 = ref();
 
 /**
  * 登录表单引用
@@ -128,14 +95,14 @@ const captchaBase64 = ref();
 const loginFormRef = ref(ElForm);
 
 const loginData = ref<LoginData>({
-  username: 'admin',
-  password: '123456'
+  account: 'admin',
+  password: '123456',
+  code: '123'
 });
 
 const loginRules = {
-  username: [{ required: true, trigger: 'blur' }],
-  password: [{ required: true, trigger: 'blur', validator: passwordValidator }],
-  verifyCode: [{ required: true, trigger: 'blur' }]
+  account: [{ required: true, trigger: 'blur' }],
+  password: [{ required: true, trigger: 'blur', validator: passwordValidator }]
 };
 
 /**
@@ -155,17 +122,6 @@ function passwordValidator(rule: any, value: any, callback: any) {
 function checkCapslock(e: any) {
   const { key } = e;
   isCapslock.value = key && key.length === 1 && key >= 'A' && key <= 'Z';
-}
-
-/**
- * 获取验证码
- */
-function getCaptcha() {
-  getCaptchaApi().then(({ data }) => {
-    const { verifyCodeBase64, verifyCodeKey } = data;
-    loginData.value.verifyCodeKey = verifyCodeKey;
-    captchaBase64.value = verifyCodeBase64;
-  });
 }
 
 /**
@@ -194,20 +150,12 @@ function handleLogin() {
 
           router.push({ path: redirect, query: otherQueryParams });
         })
-        .catch(() => {
-          // 验证失败，重新生成验证码
-          getCaptcha();
-        })
         .finally(() => {
           loading.value = false;
         });
     }
   });
 }
-
-onMounted(() => {
-  getCaptcha();
-});
 </script>
 
 <style lang="scss" scoped>

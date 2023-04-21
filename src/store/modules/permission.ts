@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { constantRoutes } from '@/router';
 import { store } from '@/store';
 import { listRoutes } from '@/api/menu';
+import { da } from 'element-plus/es/locale';
 
 const modules = import.meta.glob('../../views/**/**.vue');
 const Layout = () => import('@/layout/index.vue');
@@ -87,8 +88,10 @@ export const usePermissionStore = defineStore('permission', () => {
       // 接口获取所有路由
       listRoutes()
         .then(({ data: asyncRoutes }) => {
+          console.log(asyncRoutes);
           // 根据角色获取有访问权限的路由
           const accessedRoutes = filterAsyncRoutes(asyncRoutes, roles);
+
           setRoutes(accessedRoutes);
           resolve(accessedRoutes);
         })

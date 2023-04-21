@@ -44,7 +44,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       proxy: {
         [env.VITE_APP_BASE_API]: {
           // 线上接口API地址
-          target: 'http://vapi.youlai.tech',
+          target: 'http://124.221.104.117:9999/api/admin/v1/hsh',
           // 本地接口API地址
           // target: 'http://localhost:8989',
           changeOrigin: true,
